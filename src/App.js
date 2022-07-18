@@ -1,3 +1,7 @@
+// import { createStore } from "redux"
+// import { Provider } from "react-redux"
+// import { store } from './store'
+
 import './App.css';
 import FORM from './components/form'
 import WEATHER from './components/weather'
@@ -9,6 +13,10 @@ function App() {
 
   const [addedWeather, setAddedWeather] = useState({})
 
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => gettingWeather([latitude, longitude]))
+  }, [])
+
   const gettingWeather = async (e) => {
     if (Array.isArray(e)) {
       const api_url_cord = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${e[0]}&lon=${e[1]}&appid=${API_KEY}`)
@@ -17,7 +25,7 @@ function App() {
       setAddedWeather({
         ...addedWeather,
         [data.name]: {
-          "main":true,
+          "main": true,
           "city": data.name,
           "country": data.sys.country,
           "temp": data.main.temp,
@@ -35,7 +43,7 @@ function App() {
         setAddedWeather({
           ...addedWeather,
           [city]: {
-            "main":false,
+            "main": false,
             "city": data.name,
             "country": data.sys.country,
             "temp": data.main.temp,
@@ -46,19 +54,16 @@ function App() {
 
   }
   const deleteCity = (e) => {
-    console.log(1);
+    let state = addedWeather
+    delete state[e]
+    setAddedWeather(state)
   }
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
-      gettingWeather([latitude, longitude]) 
-    })
-  }, [])
 
   return (
     <div className="App">
       <FORM weatherScript={gettingWeather} />
-      <WEATHER addedWeather={addedWeather} deleteCity={deleteCity}/>
-      <button onClick={()=>console.log(addedWeather)}>123</button>
+      <WEATHER addedWeather={addedWeather} deleteCity={deleteCity} />
+      <button onClick={() => console.log(addedWeather)}>123</button>
     </div>
   );
 }
